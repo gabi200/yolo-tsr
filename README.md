@@ -46,7 +46,7 @@ project-name/
 
 ### 2.2 Caracteristicile dataset-ului
 
-* **Număr total de observații:** 4381
+* **Număr total de observații:** 3253
 * **Număr de caracteristici (features):** 2
 * **Tipuri de date:** Imagini, Categoriale
 * **Format fișiere:** PNG
@@ -68,10 +68,7 @@ project-name/
 
 ### 3.2 Probleme identificate
 
-* [exemplu] Feature X are 8% valori lipsă
-* [exemplu] Distribuția feature Y este puternic neuniformă
-* [exemplu] Variabilitate ridicată în clase (class imbalance)
-
+TODO
 ---
 
 ##  4. Preprocesarea Datelor
@@ -82,8 +79,9 @@ project-name/
 
 ### 4.2 Transformarea caracteristicilor
 
-* **Normalizare:** convertirea în grayscale sau alt colorspace (HSL/HSV)
-* **Encoding pentru variabile categoriale**
+* **Augumentarea datelor: generare de caracteristici random (linii, patrate) pe imagini pentru a diversifica setul de date si a simula conditii reale. Dupa augumentare, s-a dublat setul de date, jumatate din total fiind generat.**
+
+
 
 ### 4.3 Structurarea seturilor de date
 
@@ -99,16 +97,14 @@ project-name/
 
 ### 4.4 Salvarea rezultatelor preprocesării
 
-* Date preprocesate în `data/processed/`
+* Datele preprocesate sunt salvate direct în folderul train
 * Seturi train/val/test în foldere dedicate
-* Parametrii de preprocesare în `config/preprocessing_config.*` (opțional)
 
 ---
 
 ##  5. Fișiere Generate în Această Etapă
 
 * `data/raw/` – date brute
-* `data/processed/` – date curățate & transformate
 * `data/train/`, `data/validation/`, `data/test/` – seturi finale
 * `src/preprocessing/` – codul de preprocesare
 * `data/README.md` – descrierea dataset-ului
@@ -118,8 +114,8 @@ project-name/
 ##  6. Stare Etapă (de completat de student)
 
 - [x] Structură repository configurată
-- [ ] Dataset analizat (EDA realizată)
-- [ ] Date preprocesate
+- [] Dataset analizat (EDA realizată)
+- [x] Date preprocesate
 - [ ] Seturi train/val/test generate
 - [ ] Documentație actualizată în README + `data/README.md`
 

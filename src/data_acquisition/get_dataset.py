@@ -1,16 +1,30 @@
-import os
+import shutil
 
-from dotenv import load_dotenv
-from roboflow import Roboflow
+import kagglehub
 
-load_dotenv()
+# Download latest version
+try:
+    cache_path = kagglehub.dataset_download("raduoprea/traffic-signs")
+except Exception as e:
+    print(f"Error downloading dataset: {e}")
 
-if os.getenv("ROBOFLOW_API_KEY") is None:
-    raise ValueError("ROBOFLOW_API_KEY environment variable is not set")
+print("Path to dataset files:", cache_path)
 
-rf = Roboflow(api_key=os.getenv("ROBOFLOW_API_KEY"))
+print("Copying to dataset folder from cache...")
 
-# download dataset from Roboflow
-project = rf.workspace("radu-oprea-r4xnm").project("traffic-signs-detection-europe")
-version = project.version(14)
-dataset = version.download("yolov9")
+try:
+    shutil.copytree(
+        cache_path + "/V2 - Traffic Signs/train", "../../data/raw", dirs_exist_ok=True
+    )
+    shutil.copytree(
+        cache_path + "/V2 - Traffic Signs/valid",
+        "../../data/validation",
+        dirs_exist_ok=True,
+    )
+    print("Done copying dataset.")
+except Exception as e:
+    print(f"Error copying dataset: {e}")
+
+print("Cleaning up...")
+
+shutil.rmtree(cache_path)

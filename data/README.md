@@ -9,7 +9,7 @@
 
 ### 2.2 Caracteristicile dataset-ului
 
-* **Număr total de observații:** 4381
+* **Număr total de observații:** 3253
 * **Număr de caracteristici (features):** 2
 * **Tipuri de date:** Imagini, Categoriale
 * **Format fișiere:** PNG
