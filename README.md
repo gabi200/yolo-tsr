@@ -1,4 +1,5 @@
-# 📘 README – Etapa 3: Analiza și Pregătirea Setului de Date pentru Rețele Neuronale
+
+# Recunoastere semne de circulatie
 
 **Disciplina:** Rețele Neuronale  
 **Instituție:** POLITEHNICA București – FIIR  
@@ -9,11 +10,11 @@
 
 ## Introducere
 
-Acest document descrie activitățile realizate în **Etapa 3**, în care se analizează și se preprocesează setul de date necesar proiectului „Rețele Neuronale". Scopul etapei este pregătirea corectă a datelor pentru instruirea modelului RN, respectând bunele practici privind calitatea, consistența și reproductibilitatea datelor.
+Acest proiect implementeaza un sistem de recunoastere a semnelor de circulatie implementat in Python, folosind in principal bibliotecile YOLO si OpenCV.
 
 ---
 
-##  1. Structura Repository-ului Github (versiunea Etapei 3)
+##  1. Structura Repository-ului Github 
 
 ```
 project-name/
@@ -60,63 +61,36 @@ project-name/
 
 ---
 
-##  3. Analiza Exploratorie a Datelor (EDA) – Sintetic
+##  3. Analiza Exploratorie a Datelor (EDA)
 
 ### 3.1 Statistici descriptive aplicate
 
 * **Distribuții pe caracteristici** (histograme)
 
 ### 3.2 Probleme identificate
-
-TODO
+- TODO
 ---
 
 ##  4. Preprocesarea Datelor
 
-### 4.1 Curățarea datelor
+###  4.1 Transformarea caracteristicilor
 
-* **Eliminare duplicatelor**
-
-### 4.2 Transformarea caracteristicilor
-
-* **Augumentarea datelor: generare de caracteristici random (linii, patrate) pe imagini pentru a diversifica setul de date si a simula conditii reale. Dupa augumentare, s-a dublat setul de date, jumatate din total fiind generat.**
+* **Augumentarea datelor:** generare de caracteristici random (linii, patrate) pe imagini pentru a diversifica setul de date si a simula conditii reale. Dupa augumentare, s-a dublat setul de date, jumatate din total fiind generat.
 
 
+### 4.2 Structurarea seturilor de date
 
-### 4.3 Structurarea seturilor de date
-
-**Împărțire recomandată:**
-* 70–80% – train
-* 10–15% – validation
-* 10–15% – test
+**Împărțirea datelor:**
+* 80% – train
+* 10% – validation
+* 10% – test
 
 **Principii respectate:**
 * Stratificare pentru clasificare
 * Fără scurgere de informație (data leakage)
 * Statistici calculate DOAR pe train și aplicate pe celelalte seturi
 
-### 4.4 Salvarea rezultatelor preprocesării
+### 4.3 Salvarea rezultatelor preprocesării
 
 * Datele preprocesate sunt salvate direct în folderul train
 * Seturi train/val/test în foldere dedicate
-
----
-
-##  5. Fișiere Generate în Această Etapă
-
-* `data/raw/` – date brute
-* `data/train/`, `data/validation/`, `data/test/` – seturi finale
-* `src/preprocessing/` – codul de preprocesare
-* `data/README.md` – descrierea dataset-ului
-
----
-
-##  6. Stare Etapă (de completat de student)
-
-- [x] Structură repository configurată
-- [] Dataset analizat (EDA realizată)
-- [x] Date preprocesate
-- [ ] Seturi train/val/test generate
-- [ ] Documentație actualizată în README + `data/README.md`
-
----
