@@ -4,14 +4,20 @@ import sys
 import threading
 import time
 
+from logger import get_logger
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(current_dir, "..", "preprocessing"))
+
+log = get_logger(__name__)
 
 import analysis
 import cv2
 import numpy as np
 from flask import Flask, Response, jsonify, render_template, request, send_file
 from ultralytics import YOLO
+
+log.info("Started inference/web UI module")
 
 # --- Configuration ---
 MODEL_PATH = "../models/yolov9m.pt"
@@ -28,7 +34,7 @@ LABELS_DIR = "../../data/train/labels"
 for path in POSSIBLE_PATHS:
     if os.path.exists(path):
         LABELS_DIR = path
-        print(f"Found labels directory at: {LABELS_DIR}")
+        log.info(f"Found labels directory at: {LABELS_DIR}")
         break
 
 # Global variables
@@ -41,9 +47,10 @@ app = Flask(__name__)
 try:
     print(f"Loading model from {MODEL_PATH}...")
     model = YOLO(MODEL_PATH)
-    print("Model loaded successfully.")
+    log.info("Model loaded successfully")
 except Exception as e:
     print(f"Error loading model: {e}")
+    log.error(f"Error loading model: {e}")
     model = None
 
 
@@ -75,10 +82,12 @@ def get_error_frame(message):
 def capture_frames():
     global outputFrame, lock, conf_threshold
     print(f"Attempting to open Webcam ID: {WEBCAM_ID}...")
+    log.info(f"Attempting to open Webcam ID: {WEBCAM_ID}...")
     cap = cv2.VideoCapture(WEBCAM_ID)
 
     if not cap.isOpened():
         print("Error: Could not open webcam.")
+        log.error("Could not open webcam.")
         with lock:
             outputFrame = get_error_frame("Error: Could not open webcam")
         return
@@ -90,6 +99,7 @@ def capture_frames():
         if not success:
             with lock:
                 outputFrame = get_error_frame("Camera disconnected")
+                log.warning("Camera disconnected")
             time.sleep(1)
             continue
 
@@ -126,6 +136,7 @@ def capture_frames():
                             lineType=cv2.LINE_AA,
                         )
             except Exception as e:
+                log.error(f"Inference Error: {e}")
                 print(f"Inference Error: {e}")
 
         with lock:

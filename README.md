@@ -34,7 +34,13 @@ Daca aplicația este rulată pe **Windows**, se recomandă folosirea [Python Ins
 - Rulați aplicatia:
 
   `py -V:3.12 .\src\app\main.py`
+  
+## Despre arhitrctura RN
 
+Am ales folosirea **YOLO** deoarece acest model este specializat pe detecția de obiecte/feature-uri și a fost folosit si in detecția de semne de circulație. A fost aleasă versiunea **YOLOv9**, deoarece aceasta oferă un echilibru între performanța detecției și resursele utilizate. Astfel, sistemul poate fi rulat si pe sisteme embedded, de exemplu un **calculator de bord** inclus într-un vehicul sau un **single-board computer** (SBC).
+
+**NOTA: ** La finalul Etapei 4, modelul NU are training pe datasetul propriu, astfel incat nu recunoaste semne de circulatie. Acesta va recunoaste doar obiecte generice, modelul fiind cel furnizat de Ultralytics.
+ 
 ##  1. Structura Repository-ului Github 
 
 ```
@@ -131,23 +137,23 @@ proiect-rn-[nume-prenume]/
 **Total observații finale:** 7634 (după Etapa 3 + Etapa 4)
 **Observații originale:** 3252 (42.6%)
 
-**Tipul contribuției:**
+***Tipul contribuției:**
 [ ] Date generate prin simulare fizică  
 [ ] Date achiziționate cu senzori proprii  
 [ ] Etichetare/adnotare manuală  
 [ ] Date sintetice prin metode avansate  
+[X] Date generate computațional
 
 **Descriere detaliată:**
-[Explicați în 2-3 paragrafe cum ați generat datele, ce metode ați folosit, 
-de ce sunt relevante pentru problema voastră, cu ce parametri ați rulat simularea/achiziția]
+Am generat feature-uri random (linii, patrate) pe imaginile din dataset,
+folosind OpenCV, reprezentand o augumentare complexa a datelor.
 
 **Locația codului:** `src/data_acquisition/generate_img.py`
 **Locația datelor:** `data/generated/`
 
 **Dovezi:**
-- Grafic comparativ: `docs/generated_vs_real.png`
-- Setup experimental: `docs/acquisition_setup.jpg` (dacă aplicabil)
-- Tabel statistici: `docs/data_statistics.csv`
+- Log generare: `docs/log_generare.txt`
+
 
 ## 7. Diagrama State Machine
 ### Justificarea State Machine-ului ales:

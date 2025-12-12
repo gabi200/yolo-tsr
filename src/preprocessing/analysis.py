@@ -1,4 +1,5 @@
 import os
+import sys
 from collections import defaultdict
 
 import matplotlib
@@ -8,6 +9,15 @@ matplotlib.use("Agg")
 import io
 
 import matplotlib.pyplot as plt
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, "..", "app"))
+
+from logger import get_logger
+
+log = get_logger(__name__)
+
+log.info("Started analysis module")
 
 # 1. Define the dataset classes exactly as provided
 CLASS_NAMES = [
@@ -81,6 +91,8 @@ def generate_analysis_image(labels_dir=None):
     """
     target_dir = labels_dir if labels_dir else DEFAULT_LABELS_DIR
 
+    log.info("Generating histogram image...")
+
     # Counters
     category_counts = defaultdict(int)
     individual_counts = defaultdict(int)
@@ -88,11 +100,13 @@ def generate_analysis_image(labels_dir=None):
 
     # Handle missing directory gracefully for the web app
     if not os.path.exists(target_dir):
+        log.error(f"Directory not found: {target_dir}")
         return create_error_image(f"Directory not found: {target_dir}")
 
     files = [f for f in os.listdir(target_dir) if f.endswith(".txt")]
 
     if not files:
+        log.error("No .txt files found in directory.")
         return create_error_image("No .txt files found in directory.")
 
     for filename in files:

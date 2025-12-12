@@ -1,11 +1,20 @@
 import os
 import random
+import sys
 
 import cv2
 import numpy as np
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(current_dir, "..", "app"))
+
+from logger import get_logger
+
+log = get_logger(__name__)
+
 
 def augument(image_path, output_path):
+    log.info(f"Generating image from source img with path {image_path}...")
     img = cv2.imread(image_path)
     if img is None:
         return
@@ -26,3 +35,4 @@ def augument(image_path, output_path):
     cv2.rectangle(img, top_left, bottom_right, (0, 0, 0), -1)
 
     cv2.imwrite(output_path, img)
+    log.info(f"Written generated image to {output_path}...")
