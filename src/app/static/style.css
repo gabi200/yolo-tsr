@@ -83,12 +83,19 @@ img {
     display: block;
 }
 
+/* Sidebar for Controls + Detection Log */
+.sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 300px;
+}
+
 .controls {
     background-color: #333;
     padding: 20px;
     border-radius: 8px;
-    flex: 1;
-    min-width: 300px;
     height: fit-content;
 }
 
@@ -113,6 +120,58 @@ input[type="range"] {
     color: #888;
     font-size: 0.9em;
     margin-top: 5px;
+}
+
+/* Detection Log (Live) */
+.detection-log-box {
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: 400px; /* Limit height */
+}
+
+.detection-log-box h3 {
+    margin-top: 0;
+    color: #00ffcc;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+}
+
+.log-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    font-weight: bold;
+    color: #aaa;
+    font-size: 0.9em;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #444;
+}
+
+.detection-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.detection-item {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    padding: 5px 0;
+    border-bottom: 1px solid #444;
+}
+
+.detection-item:last-child {
+    border-bottom: none;
+}
+.det-class {
+    color: #fff;
+    font-weight: bold;
 }
 
 /* Toggle Switch */
@@ -227,6 +286,47 @@ input:checked + .slider:before {
 .status-msg {
     margin-top: 10px;
     font-weight: bold;
+}
+
+/* System Log Viewer */
+.logs-container {
+    display: flex;
+    flex-direction: column;
+    height: 600px;
+}
+
+.logs-container h2 {
+    color: #00ffcc;
+    margin-top: 0;
+}
+
+.log-actions {
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.status-dot {
+    height: 10px;
+    width: 10px;
+    background-color: #00ff00;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.system-log-viewer {
+    background-color: #111;
+    color: #00ff00;
+    font-family: "Courier New", Courier, monospace;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    overflow-y: scroll;
+    flex-grow: 1;
+    white-space: pre-wrap; /* Preserve formatting but wrap lines */
+    font-size: 0.9em;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 /* Stats Section */

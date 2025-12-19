@@ -1,9 +1,11 @@
 import base64
+import datetime
 import math
 import os
 import sys
 import threading
 import time
+from collections import deque
 
 import cv2
 import numpy as np
@@ -24,6 +26,7 @@ import analysis
 # --- Configuration ---
 MODEL_PATH = "../models/yolov9m.pt"
 WEBCAM_ID = 0
+LOG_FILE_PATH = "logs/app_activity.log"
 
 # Try to find the labels directory
 POSSIBLE_PATHS = [
@@ -43,8 +46,11 @@ for path in POSSIBLE_PATHS:
 outputFrame = None
 lock = threading.Lock()
 conf_threshold = 0.5
-inference_enabled = True  # Default to True
+inference_enabled = True
 app = Flask(__name__)
+
+# Store recent detections for the UI log (Max 50 items)
+detection_history = deque(maxlen=50)
 
 # Initialize YOLO Model
 try:
@@ -94,6 +100,8 @@ def process_frame(frame, conf_thresh):
         # Run inference
         results = model(frame, conf=conf_thresh, verbose=False)
 
+        current_detections = []
+
         for r in results:
             boxes = r.boxes
             for box in boxes:
@@ -121,6 +129,21 @@ def process_frame(frame, conf_thresh):
                     thickness=1,
                     lineType=cv2.LINE_AA,
                 )
+
+                # Add to current detections list
+                current_detections.append(
+                    {
+                        "time": datetime.datetime.now().strftime("%H:%M:%S"),
+                        "class": current_class,
+                        "conf": f"{conf:.2f}",
+                    }
+                )
+
+        # Update global history with unique detections from this frame (to avoid spamming the log)
+        # We assume if the class and conf are identical to the last entry, it's the same object
+        for det in current_detections:
+            if not detection_history or (detection_history[0]["class"] != det["class"]):
+                detection_history.appendleft(det)
 
     except Exception as e:
         log.error(f"Inference Error in process_frame: {e}")
@@ -229,12 +252,12 @@ def update_settings():
 def upload_image():
     log.info("Started image upload")
     if "file" not in request.files:
-        log.warning("Image upload failed: No file part")
+        log.warning("No file part")
         return jsonify({"error": "No file part"})
 
     file = request.files["file"]
     if file.filename == "":
-        log.warning("Image upload failed: No selected file")
+        log.warning("No selected file")
         return jsonify({"error": "No selected file"})
 
     try:
@@ -255,6 +278,30 @@ def upload_image():
     except Exception as e:
         log.error(f"Error processing uploaded image: {e}")
         return jsonify({"error": str(e)})
+
+
+@app.route("/get_detections")
+def get_detections():
+    """Returns the list of recent detections."""
+    return jsonify(list(detection_history))
+
+
+@app.route("/get_app_log")
+def get_app_log():
+    """Reads the log file and returns its content."""
+    content = ""
+    try:
+        if os.path.exists(LOG_FILE_PATH):
+            with open(LOG_FILE_PATH, "r", encoding="utf-8") as f:
+                # Read the last 200 lines to keep the payload size manageable
+                lines = f.readlines()
+                content = "".join(lines[-200:])
+        else:
+            content = "Log file not found."
+    except Exception as e:
+        content = f"Error reading log file: {e}"
+
+    return jsonify({"content": content})
 
 
 @app.route("/dataset_stats.png")

@@ -26,6 +26,9 @@
                 <button class="tab-btn" onclick="openTab(event, 'UploadTab')">
                     📤 Image Upload
                 </button>
+                <button class="tab-btn" onclick="openTab(event, 'LogsTab')">
+                    📜 System Logs
+                </button>
             </div>
 
             <!-- Tab 1: Live Webcam -->
@@ -38,42 +41,61 @@
                         />
                     </div>
 
-                    <div class="controls">
-                        <h2>Live Controls</h2>
+                    <div class="sidebar">
+                        <div class="controls">
+                            <h2>Live Controls</h2>
 
-                        <div class="control-group">
-                            <label class="switch-label">
-                                <span>Inference Active</span>
-                                <label class="switch">
-                                    <input
-                                        type="checkbox"
-                                        id="inferenceToggle"
-                                        checked
-                                    />
-                                    <span class="slider round"></span>
+                            <div class="control-group">
+                                <label class="switch-label">
+                                    <span>Inference Active</span>
+                                    <label class="switch">
+                                        <input
+                                            type="checkbox"
+                                            id="inferenceToggle"
+                                            checked
+                                        />
+                                        <span class="slider round"></span>
+                                    </label>
                                 </label>
-                            </label>
+                            </div>
+
+                            <div class="control-group">
+                                <label for="confSlider"
+                                    >Confidence Threshold:
+                                    <span id="confValue" class="value-display"
+                                        >0.50</span
+                                    ></label
+                                >
+                                <input
+                                    type="range"
+                                    id="confSlider"
+                                    min="0.01"
+                                    max="1.0"
+                                    step="0.01"
+                                    value="0.50"
+                                />
+                            </div>
+                            <p class="desc">
+                                Adjust sensitivity to reduce false positives.
+                            </p>
                         </div>
 
-                        <div class="control-group">
-                            <label for="confSlider"
-                                >Confidence Threshold:
-                                <span id="confValue" class="value-display"
-                                    >0.50</span
-                                ></label
-                            >
-                            <input
-                                type="range"
-                                id="confSlider"
-                                min="0.01"
-                                max="1.0"
-                                step="0.01"
-                                value="0.50"
-                            />
+                        <div class="detection-log-box">
+                            <h3>Detection Log (Live)</h3>
+                            <div class="log-header">
+                                <span>Time</span>
+                                <span>Class</span>
+                                <span>Conf</span>
+                            </div>
+                            <div id="detectionList" class="detection-list">
+                                <!-- JS will populate this -->
+                                <div class="detection-item">
+                                    <span>--:--:--</span>
+                                    <span>Waiting...</span>
+                                    <span>---</span>
+                                </div>
+                            </div>
                         </div>
-                        <p class="desc">
-                            Adjust sensitivity to reduce false positives.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -101,6 +123,20 @@
                             <span>No image uploaded</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: System Logs -->
+            <div id="LogsTab" class="tab-content" style="display: none">
+                <div class="logs-container">
+                    <h2>System Log File (app_activity.log)</h2>
+                    <div class="log-actions">
+                        <span class="status-dot"></span>
+                        <span id="logStatus">Live Updating...</span>
+                    </div>
+                    <pre id="systemLogViewer" class="system-log-viewer">
+Loading logs...</pre
+                    >
                 </div>
             </div>
 
@@ -201,6 +237,52 @@
                         status.style.color = "red";
                     });
             }
+
+            // Live Detection Log Polling
+            function fetchDetections() {
+                // Only poll if Live Tab is active
+                if (document.getElementById("LiveTab").style.display === "none")
+                    return;
+
+                fetch("/get_detections")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const list = document.getElementById("detectionList");
+                        list.innerHTML = "";
+                        data.forEach((item) => {
+                            const div = document.createElement("div");
+                            div.className = "detection-item";
+                            div.innerHTML = `<span>${item.time}</span><span class="det-class">${item.class}</span><span>${item.conf}</span>`;
+                            list.appendChild(div);
+                        });
+                    });
+            }
+            setInterval(fetchDetections, 1000);
+
+            // System Log Polling
+            function fetchSystemLog() {
+                // Only poll if Logs Tab is active
+                if (document.getElementById("LogsTab").style.display === "none")
+                    return;
+
+                fetch("/get_app_log")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const viewer =
+                            document.getElementById("systemLogViewer");
+                        // Check if scrolled to bottom before updating to keep auto-scroll
+                        const isScrolledToBottom =
+                            viewer.scrollHeight - viewer.clientHeight <=
+                            viewer.scrollTop + 1;
+
+                        viewer.textContent = data.content;
+
+                        if (isScrolledToBottom) {
+                            viewer.scrollTop = viewer.scrollHeight;
+                        }
+                    });
+            }
+            setInterval(fetchSystemLog, 2000);
         </script>
     </body>
 </html>
