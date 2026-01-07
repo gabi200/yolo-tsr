@@ -1,3 +1,5 @@
+
+
 # 📘 README – Etapa 5: Configurarea și Antrenarea Modelului RN
 
 **Disciplina:** Rețele Neuronale  
@@ -97,28 +99,27 @@ Completați tabelul cu hiperparametrii folosiți și **justificați fiecare aleg
 
 | **Hiperparametru** | **Valoare Aleasă** | **Justificare** |
 |--------------------|-------------------|-----------------|
-| Learning rate | Ex: 0.001 | Valoare standard pentru Adam optimizer, asigură convergență stabilă |
-| Batch size | Ex: 32 | Compromis memorie/stabilitate pentru N=[numărul vostru] samples |
-| Number of epochs | Ex: 50 | Cu early stopping după 10 epoci fără îmbunătățire |
-| Optimizer | Ex: Adam | Adaptive learning rate, potrivit pentru RN cu [numărul vostru] straturi |
-| Loss function | Ex: Categorical Crossentropy | Clasificare multi-class cu K=[numărul vostru] clase |
-| Activation functions | Ex: ReLU (hidden), Softmax (output) | ReLU pentru non-linearitate, Softmax pentru probabilități clase |
+| Learning rate | 0.1| Valoare standard YOLO, este adecvată pentru learning rate optimizer `cos_LR` |
+| Batch size | 10 | Compromis memorie/stabilitate |
+| Number of epochs |  50 | Cu early stopping după 5 epoci fără îmbunătățire |
+| Optimizer | SGD (Stochastic Gradient Descent) | Oferă acuratețe sporită în task-urile de object detection |
+| Loss function | Classification loss (binary cross-entropy), Box Loss | Metode standard YOLO. Parametri pentru classification loss: cls=1.5. Box loss: 7.5 (default) |
+| Activation functions | SiLU (Sigmoid Linear Unit)| Adecvat pentru object detection, inclus in YOLO |
 
-**Justificare detaliată batch size (exemplu):**
-```
-Am ales batch_size=32 pentru că avem N=15,000 samples → 15,000/32 ≈ 469 iterații/epocă.
+**Justificare detaliată batch size**
+
+Am ales `batch_size=10` pentru că avem N=7634 samples → 7634/11 = 694 iterații/epocă.
 Aceasta oferă un echilibru între:
 - Stabilitate gradient (batch prea mic → zgomot mare în gradient)
 - Memorie GPU (batch prea mare → out of memory)
-- Timp antrenare (batch 32 asigură convergență în ~50 epoci pentru problema noastră)
-```
 
-**Resurse învățare rapidă:**
-- Împărțire date: https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html (video 3 min: https://youtu.be/1NjLMWSGosI?si=KL8Qv2SJ1d_mFZfr)  
-- Antrenare simplă Keras: https://keras.io/examples/vision/mnist_convnet/ (secțiunea „Training”)  
-- Antrenare simplă PyTorch: https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html#training-an-image-classifier (video 2 min: https://youtu.be/ORMx45xqWkA?si=FXyQEhh0DU8VnuVJ)  
-- F1-score: https://scikit-learn.org/stable/modules/generated/sklearn.metrics.f1_score.html (video 4 min: https://youtu.be/ZQlEcyNV6wc?si=VMCl8aGfhCfp5Egi)
+Batch size a fost determinat experimental. Modelul a fost antrenat pe un GPU cu 8 GB VRAM, TDP 150W. Au fost testate valori între 9 și 16, iar pentru a determina valoarea optimă am urmărit puterea consumată de GPU și utilizarea VRAM. 
+Puterea electrică consumată este indicatorul optim pentru munca efectivă realizată de GPU. Procentajul de utilizare indicat de sistemul de operare este relativ și poate fi influențat de diferiți factor (ce nuclee din GPU sunt utilizate, frecvența curentă, etc.). Este important ca utilizarea VRAM să fie <8 GB în acest caz, iar în cazul depășirii, o parte din date este stocată în memoria RAM principală. Astfel, apare un bottleneck doarece datele trebuie transferate prin magistrala PCIe, și memoria RAM este mai lentă decât cea VRAM.
 
+Pentru acest workload, puterea maximă atinsă a fost de aprox. **120W** (fluctuează 100-120W) pentru `batch_size=10`. 
+
+**Justificare  parametri loss functions**
+Classification loss gain (cls = 1.5). Există 55 de clase, dintre care multe sunt similare (de ex, semnele de limită de viteză). Valoarea default este 0.5, însă am crescut-o deoarece această reprezintă "penalizarea" claselor greșite. Este necesară o penalizare ridicată pentru a diferenția clar și clasele care arată foarte similar.
 
 ---
 
@@ -139,10 +140,19 @@ Includeți **TOATE** cerințele Nivel 1 + următoarele:
 - **Acuratețe ≥ 75%**
 - **F1-score (macro) ≥ 0.70**
 
-**Resurse învățare (aplicații industriale):**
-- Albumentations: https://albumentations.ai/docs/examples/   
-- Early Stopping + ReduceLROnPlateau în Keras: https://keras.io/api/callbacks/   
-- Scheduler în PyTorch: https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate 
+**Justificare learning rate scheduler**
+Am folosit learning scheduler `cos_lr` (cosine annealing), deoarece acesta ajută în cazurile în care clasele sunt similare (de ex. un semn de limită de viteză 30 km/h vs. limită 50 km/h) și rezultă într-o acuratețe mai bună pentru această aplicație.
+
+**Augumentări relevante domeniu**
+Am aplicat următoarele augumentări:
+- `hsv_h=0.015` (hue). Am setat această valoare la o valoare foarte scăzută pentru a nu schimba radical culorile, acestea fiind importante pentru identificarea tipului de acțiune (albastru = indicator de obligație, roșu = interzicere etc.)
+- `hsv_s=0.6`(saturation). Valoarea de saturație ajută la simularea diferitelor condiții de lumină sau a semnelor murdare.
+- `hsv_v=0.5`(value).  Această valoare reprezintă luminozitatea și ajută la simularea condițiilor de lumină variate.
+- `scale=0.8` Această valoare simulează o variație relativ mare de dimeniuni, deoarece semnele de circulație pot fi la diferite distanțe față de vehicul.
+- `shear=2.0`. Această valoare este considerată scăzută, deoarece fenomenul de "shear" nu este comun în această aplicație. Însă, a fost aleasă o val. non-zero, deoarece pot fi generate mici fenomene "shear" din cauza lentilei camerei sau a vibrațiilor.
+- `perspective=0.001`. Această valoare este importantă, deoarece semnele de circulație sunt  deseori distorsionate. Această augumentare simulează diferite perspective.
+- `fliplr=0`. Această augumentare este setată la **zero**, iar acest lucru este **critic**. Setarea default din YOLO este 0.5, ceea ce ar rezulta în imagini care ar fi flipped. Acest lucru este extrem de periculos, deoarece un indicator de *obligatoriu stânga*, ar putea deveni *obligatoriu dreapta*.
+- `degrees=3`. Este simulată o variație a  înclinării de maxim 3 grade, simulând o mică înclinare a camerei sau a semnelor.
 
 ---
 
@@ -199,61 +209,29 @@ prediction = model.predict(input_scaled)  # predicție REALĂ și corectă
 
 ### 1. Pe ce clase greșește cel mai mult modelul?
 
-**Exemplu robotică (predicție traiectorii):**
-```
-Confusion Matrix arată că modelul confundă 'viraj stânga' cu 'viraj dreapta' în 18% din cazuri.
-Cauză posibilă: Features-urile IMU (gyro_z) sunt simetrice pentru viraje în direcții opuse.
-```
-
 **Completați pentru proiectul vostru:**
-```
-[Descrieți confuziile principale între clase și cauzele posibile]
-```
+
+Modelul confundă forb_speed_over_80 (limită de viteză 80 km/h) cu  forb_overtake (depășirea interzisă) în 33% din cazuri. Acest fenomen se întâmplă deoarece acestea au aceeași formă (circulară), aceeași culoare (margine roșie și fundal alb), singura diferență fiind simbolul din interior.
 
 ### 2. Ce caracteristici ale datelor cauzează erori?
 
-**Exemplu vibrații motor:**
-```
-Modelul eșuează când zgomotul de fond depășește 40% din amplitudinea semnalului util.
-În mediul industrial, acest nivel de zgomot apare când mai multe motoare funcționează simultan.
-```
-
-**Completați pentru proiectul vostru:**
-```
-[Identificați condițiile în care modelul are performanță slabă]
-```
+Modelul are dificultăți în identificarea detaliilor fine (simboluri sau cifre), acesta punând prea mult accent pe forma și culoarea semnelor. De asemenea, apar probleme în special când semnul ocupă sub 5% din suprafața imaginii.
 
 ### 3. Ce implicații are pentru aplicația industrială?
 
-**Exemplu detectare defecte sudură:**
-```
-FALSE NEGATIVES (defect nedetectat): CRITIC → risc rupere sudură în exploatare
-FALSE POSITIVES (alarmă falsă): ACCEPTABIL → piesa este re-inspectată manual
+FALSE NEGATIVES și FALSE POSITIVES: ambele pot fi **critice**, în funcție de semnul nedetectat sau fals detectat.
 
-Prioritate: Minimizare false negatives chiar dacă cresc false positives.
-Soluție: Ajustare threshold clasificare de la 0.5 → 0.3 pentru clasa 'defect'.
-```
+De exemplu, detectarea falsă a unui semn de "drum cu prioriatate" într-o situație în care vehiculul de fapt nu avea prioritate -> eroare catastrofică. 
 
-**Completați pentru proiectul vostru:**
-```
-[Analizați impactul erorilor în contextul aplicației voastre și prioritizați]
-```
+În același mod, nedetectarea unui semn STOP rezultă într-o greșelă critică (neacordare de prioritate).
 
 ### 4. Ce măsuri corective propuneți?
 
-**Exemplu clasificare imagini piese:**
-```
-Măsuri corective:
-1. Colectare 500+ imagini adiționale pentru clasa minoritară 'zgârietură ușoară'
-2. Implementare filtrare Gaussian blur pentru reducere zgomot cameră industrială
-3. Augmentare perspective pentru simulare unghiuri camera variabile (±15°)
-4. Re-antrenare cu class weights: [1.0, 2.5, 1.2] pentru echilibrare
-```
 
-**Completați pentru proiectul vostru:**
-```
-[Propuneți minimum 3 măsuri concrete pentru îmbunătățire]
-```
+1. Colectare imagini adiționale pentru clasele care generează confuzie (forb_overtake și semnele de limită de viteză)
+2. Modificări arhitecturale pentru anumite categorii de semne (de exemplu, identificarea unui semn de limită de viteză generic și apoi rularea unui altui stage (OCR) pentru identificarea cifrelor)
+3. Implementare filtru Gaussian blur
+4. Creștere rezoluție imagini (de la 640px la 960px)
 
 ---
 

@@ -1,5 +1,6 @@
 
 
+
 # Recunoastere semne de circulatie
 
 **Disciplina:** Rețele Neuronale  
@@ -34,7 +35,18 @@ Daca aplicația este rulată pe **Windows**, se recomandă folosirea [Python Ins
 - Rulați aplicatia:
 
   `py -V:3.12 .\src\app\main.py`
+
+	- Înainte de orice altă operațiune, selectați `Download dataset and generate data` și asteptați finalizarea scriptului, pentru descarcarea dataset-ului și generarea datelor originale.
+	- Pentru rularea intefaței web, selecați `Run web UI`.
+
+### Pentru antrenare:
+- Deoarece acesta este un SIA care lucrează cu imagini, se recomandă folosirea unui **GPU** pentru antrenare (de ex. prin tehnologia CUDA pentru Nvidia). Antrenarea pe **CPU** este extrem de lentă.
+- Este necesară instalarea versiunii PyTorch corespunzătoare pentru sistemul pe care este efectuată antrenarea, pentru suport CUDA/ROCm: [Download PyTorch](https://pytorch.org/)
+- Modelul a fost antrenat folosind CUDA pe un GPU Nvidia GeForce RTX 5060, 8GB VRAM. Pentru seria **RTX 5000**, se poate folosi următoarea comandă pentru a instala PyTorch:
+
+`py -V:3.12 -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130`
   
+  - Rulația aplicația (ca mai sus) și selectați `Train model`. La prompt-ul `Enter custom training parameters?` selectați `n` pentru a continua cu setările predefinite.
 ## Despre arhitectura RN
 
 Am ales folosirea **YOLO** deoarece acest model este specializat pe detecția de obiecte/feature-uri și a fost folosit si in detecția de semne de circulație. A fost aleasă versiunea **YOLOv9**, deoarece aceasta oferă un echilibru între performanța detecției și resursele utilizate. Astfel, sistemul poate fi rulat si pe sisteme embedded, de exemplu un **calculator de bord** inclus într-un vehicul sau un **single-board computer** (SBC).

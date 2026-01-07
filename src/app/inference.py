@@ -24,7 +24,7 @@ sys.path.append(os.path.join(current_dir, "..", "preprocessing"))
 import analysis
 
 # --- Configuration ---
-MODEL_PATH = "../models/yolov9m.pt"
+MODEL_PATH = "../models/trained_model.pt"
 WEBCAM_ID = 0
 LOG_FILE_PATH = "logs/app_activity.log"
 

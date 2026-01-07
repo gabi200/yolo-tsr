@@ -1,6 +1,10 @@
-kagglehub
-numpy
-opencv-python
-matplotlib
-flask
-ultralytics
+kagglehub>=0.2.7
+numpy>=1.26.4
+opencv-python>=4.10.0.84
+matplotlib>=3.9.0
+flask>=3.0.3
+ultralytics>=8.3.0
+onnx>=1.12.0,<=1.19.1
+onnxslim>=0.1.71
+onnxruntime-gpu
+pandas>=2.2.2

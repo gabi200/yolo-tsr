@@ -18,9 +18,9 @@ def main():
     # 1. Setup Device (GPU is highly recommended)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     log.info(f"Using device: {device}")
-    print("Loading YOLOv9c model...")
-    log.info("Loading YOLOv9c model...")
-    model = YOLO("../models/yolov9m.pt")
+    print("Loading YOLOv9m model...")
+    log.info("Loading YOLOv9m model...")
+    model = YOLO("models/untrained_model.yaml")
 
     choice = input(
         "Enter custom training parameters? Choosing 'no' will use default parameters (y/n) "
@@ -31,29 +31,46 @@ def main():
         epochs = int(input("Number of epochs: "))
         batch = int(input("Batch size: "))
         patience = int(input("Early stopping patience: "))
+        optimizer = input("Optimizer: ")
+        cls = float(input("Weight of classification loss: "))
 
         log.info(
             f"Using custom training parameters: epochs={epochs}, batch={batch}, patience={patience}"
         )
     else:
-        epochs = 100
-        batch = 16
-        patience = 20
+        epochs = 50
+        batch = 10
+        patience = 5
+        optimizer = "sgd"
+        cls = 1.5
         log.info(
             f"Using default training parameters: epochs={epochs}, batch={batch}, patience={patience}"
         )
 
     print("Starting training...")
     log.info("Starting training...")
+
     results = model.train(
         data="dataset_config.yaml",
         epochs=epochs,
         imgsz=640,
         device=device,
         batch=batch,  # Adjust based on your GPU VRAM
-        name="yolov9_traffic_signs",  # Name of the run folder
+        name="../../saved_models",  # Name of the run folder
         patience=patience,  # Early stopping patience
         plots=True,  # Save plots of training metrics
+        exist_ok=True,
+        optimizer=optimizer,
+        cls=cls,
+        cos_lr=True,
+        hsv_h=0.015,  # augumentations start
+        hsv_s=0.6,
+        hsv_v=0.5,
+        scale=0.8,
+        shear=2,
+        perspective=0.001,
+        fliplr=0,  # CRITICAL
+        degrees=3,
     )
 
     print("Validating model...")
@@ -79,9 +96,6 @@ def main():
         log.error(
             f"Could not run test set evaluation (check if 'test' path exists in yaml). Error: {e}"
         )
-
-    # Export the model (optional)
-    # model.export(format='onnx')
 
 
 if __name__ == "__main__":
