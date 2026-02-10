@@ -127,12 +127,12 @@ Am ales Experimentul 4 ca model final:
 | **Componenta** | **Stare Etapa 5** | **Modificare Etapa 6** | **Justificare** |
 |----------------|-------------------|------------------------|-----------------|
 | **Model încărcat** | `trained_model.pt` | `optimized_model.pt` | +4% accuracy, +9% F1 score, -37% timp antrenare|
- |**Logging** | Doar log-uri de sistem (stare aplicație)| Log-uri sistem + detecție (clasă detectată + confidence). Opțiune export log-uri |Audit trail complet |
- |**Preview cameră** | Stream cameră cu overlay detecție| Adăugat FPS counter | Monitorizare performanță sistem în timp real |
-  |**Snapshots** | N/A| Adăugat opțiune de captura snapshot cameră (cu overlay detecție și FPS) | Captura output sistem pentru logging/debugging |
-  |**Simulare sistem de control vehicul** | N/A| Adăugat simulare stare vehicul (vitezometru, semnalizare) care reactioneaza la semnele detectate |Demonstratie aplicatie reala a sistemului |
-   |**Detectie camera acoperita** | N/A| Detectare camera acoperita si atentionare prin alarma audio si vizuala | Asigurarea sigurantei sistemului |
-   |**Simulare cu sistem hardware** | N/A| Transmiterea datelor legate de starea vehiculului la un sistem hardware | Evidentierea legaturii dintre software si hardware intr-o aplicatie reala |
+|**Logging** | Doar log-uri de sistem (stare aplicație)| Log-uri sistem + detecție (clasă detectată + confidence). Opțiune export log-uri |Audit trail complet |
+|**Preview cameră** | Stream cameră cu overlay detecție| Adăugat FPS counter | Monitorizare performanță sistem în timp real |
+|**Snapshots** | N/A| Adăugat opțiune de captura snapshot cameră (cu overlay detecție și FPS) | Captura output sistem pentru logging/debugging |
+|**Simulare sistem de control vehicul** | N/A| Adăugat simulare stare vehicul (vitezometru, semnalizare) care reactioneaza la semnele detectate |Demonstratie aplicatie reala a sistemului |
+|**Detectie camera acoperita** | N/A| Detectare camera acoperita si atentionare prin alarma audio si vizuala | Asigurarea sigurantei sistemului |
+|**Simulare cu sistem hardware** | N/A| Transmiterea datelor legate de starea vehiculului la un sistem hardware | Evidentierea legaturii dintre software si hardware intr-o aplicatie reala |
 
 ### Modificări concrete aduse în Etapa 6:
 
@@ -287,7 +287,7 @@ Descrieți strategia folosită pentru optimizare:
 **Abordare:** Manual
 
 **Axe de optimizare explorate:**
-1. **Arhitectură:** schimbare de la `YOLO11m` la `YOLO26s`
+1. **Arhitectură:** schimbare de la `YOLO9c` la `YOLO26s`
 2. **Regularizare:** `label_smoothing=0.1`
 3. **Learning rate:** schimbare `lr0=0.001` (initial learning rate), optimizer Adam
 4. **Augmentări:** `copy_paste=0.3` (context augumentation)
@@ -320,7 +320,7 @@ Generați și salvați în `docs/optimization/`:
 - Latență: 17.6 ms (diferență neglijabilă, margin of error)
 
 **Configurație finală aleasă:**
-- Arhitectură: YOLO11m
+- Arhitectură: YOLO9c
 - Learning rate: 0.001 cu `cos_lr`
 - Batch size: 8
 - Regularizare: `label_smoothing=0.1`
@@ -396,7 +396,7 @@ Salvați în `docs/results/`:
    - Confuzie intre anumite clase, in special semnele de limita de viteza
 
 3. **Limitări infrastructură:**
-   - Model prea mare pentru deployment pe edge device
+   - Model prea mare pentru deployment pe edge device low-end (Raspberry Pi)
 
 4. **Limitări validare:**
    - Test set nu acoperă toate condițiile din situațiile reale

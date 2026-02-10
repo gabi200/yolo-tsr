@@ -88,9 +88,9 @@ project-name/
 ### 4.3 Structurarea seturilor de date
 
 **Împărțirea datelor:**
-* 65% – train
-* 17.5% – validation
-* 17.5% – test
+* 85% – train
+* 7.5% – validation
+* 7.5% – test
 
 **Principii respectate:**
 * Stratificare pentru clasificare

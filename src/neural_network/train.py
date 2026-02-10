@@ -18,8 +18,8 @@ def main():
     # 1. Setup Device (GPU is highly recommended)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     log.info(f"Using device: {device}")
-    print("Loading YOLOv9m model...")
-    log.info("Loading YOLOv9m model...")
+    print("Loading YOLOv9c model...")
+    log.info("Loading YOLOv9c model...")
     model = YOLO("models/untrained_model.yaml")
 
     choice = input(

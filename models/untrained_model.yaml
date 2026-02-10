@@ -1,6 +1,5 @@
 # Ultralytics YOLO 🚀, AGPL-3.0 license
 # YOLOv9-c (Compact) object detection model configuration
-# Standard YOLOv9c architecture with 55 classes
 
 # Parameters
 nc: 55 # number of classes (Traffic Signs)

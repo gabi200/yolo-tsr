@@ -46,7 +46,7 @@ Completați in acest readme tabelul următor cu **minimum 2-3 rânduri** care le
 |---------------------------|--------------------------------|--------------------------------|
 | Detectarea semnelor de circulatie in conditii reale si variate | Model performant, date training variate si bine augmentate -> 30% înbunătățire recunoaștere în situații complexe| RN  |
 |Rularea eficientă pe diferite platforme hardware și integrarea cu hardware fizic | Folosirea OpenCV și unui model optimizat pentru o utilizare redusă a resurselor | RN + App |
-| Fiabilitatea sistemului, necesară în industria automotive | Acuratete ridicata RN (>90%), detectie situatii critice (camera acoperita/deconectata) | RN + App |
+| Fiabilitatea sistemului, necesară în industria automotive | Acuratete ridicata RN (>95%), detectie situatii critice (camera acoperita/deconectata) | RN + App |
 
 
 **Instrucțiuni:**
