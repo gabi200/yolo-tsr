@@ -49,7 +49,7 @@ Five structured optimization experiments performed.
 
 ---
 
-## 🏗 System Structure
+##  System Structure
 
 ```
 src/
